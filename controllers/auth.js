@@ -7,7 +7,7 @@ const { nanoid } = require("nanoid");
 
 const { User } = require("../models/user");
 
-const { CustomError, ctrlWrapper, sendMail } = require("../helpers");
+const { CustomError, ctrlWrapper, sendEmail } = require("../helpers");
 
 const { SECRET_KEY, BASE_URL } = process.env;
 
@@ -37,7 +37,7 @@ const signup = async (req, res) => {
     html: `<a target="_blank" href="${BASE_URL}/api/auth/verify/${verificationCode}" >Click verify email</a>`,
   };
 
-  await sendMail(verifyEmail);
+  await sendEmail(verifyEmail);
 
   res.status(201).json({
     email: newUser.email,
@@ -45,12 +45,53 @@ const signup = async (req, res) => {
   });
 };
 
+const verifyEmail = async (req, res) => {
+  const { verificationCode } = req.params;
+  const user = await User.findOne({ verificationCode });
+  if (!user) {
+    throw CustomError(404, "Invalid code or expired link");
+  }
+  await User.findByIdAndUpdate(user._id, {
+    verify: true,
+    verificationCode: "",
+  });
+  res.json({
+    message: "Email verification was successful.",
+  });
+};
+
+const resendVerifyEmail = async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw CustomError(404, "Email not found");
+  }
+  if (user.verify) {
+    throw CustomError(403, "This account has already been verified");
+  }
+  const verifyEmail = {
+    to: email,
+    subject: "Verify email",
+    html: `<a target="_blank" href="${BASE_URL}/api/auth/verify/${user.verificationCode}" >Click verify email</a>`,
+  };
+  await sendEmail(verifyEmail);
+  res.status(204).json({
+    message: "Verification of email was successful",
+  });
+};
+
 const login = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
+
   if (!user) {
     throw CustomError(401, "You email or password is invalid.");
   }
+
+  if (!user.verify) {
+    throw CustomError(401, "Email is not verified");
+  }
+
   const passwordCompare = await bcrypt.compare(password, user.password);
   if (!passwordCompare) {
     throw CustomError(401, "You email or password is invalid.");
@@ -131,6 +172,8 @@ const updateAvatar = async (req, res) => {
 
 module.exports = {
   signup: ctrlWrapper(signup),
+  verifyEmail: ctrlWrapper(verifyEmail),
+  resendVerifyEmail: ctrlWrapper(resendVerifyEmail),
   login: ctrlWrapper(login),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),

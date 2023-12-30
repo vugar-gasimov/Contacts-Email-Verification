@@ -10,13 +10,13 @@ const transport = nodemailer.createTransport({
   },
 });
 
-const sendMail = async (data) => {
+const sendEmail = async (data) => {
   const email = { ...data, from: "vuqar5qasimov@gmail.com" };
   await transport.sendMail(email);
   return true;
 };
 
-module.exports = sendMail;
+module.exports = sendEmail;
 
 // const config = {
 //   host: "smtp.meta.ua",

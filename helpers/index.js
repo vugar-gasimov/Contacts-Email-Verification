@@ -1,11 +1,11 @@
 const CustomError = require("./CustomError");
 const ctrlWrapper = require("./ctrlWrapper");
 const handleMongooseError = require("./handleMongooseError");
-const sendMail = require("./sendMail");
+const sendEmail = require("./sendEmail");
 
 module.exports = {
   CustomError,
   ctrlWrapper,
   handleMongooseError,
-  sendMail,
+  sendEmail,
 };
