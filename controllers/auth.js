@@ -6,8 +6,10 @@ const fs = require("fs/promises");
 const { nanoid } = require("nanoid");
 
 const { User } = require("../models/user");
-const { CustomError, ctrlWrapper } = require("../helpers");
-const { SECRET_KEY } = process.env;
+
+const { CustomError, ctrlWrapper, sendMail } = require("../helpers");
+
+const { SECRET_KEY, BASE_URL } = process.env;
 
 const avatarsDir = path.join(__dirname, "../", "public", "avatars");
 
@@ -28,6 +30,14 @@ const signup = async (req, res) => {
     avatarUrl,
     verificationCode,
   });
+
+  const verifyEmail = {
+    to: email,
+    subject: "Verify email",
+    html: `<a target="_blank" href="${BASE_URL}/api/auth/verify/${verificationCode}" >Click verify email</a>`,
+  };
+
+  await sendMail(verifyEmail);
 
   res.status(201).json({
     email: newUser.email,

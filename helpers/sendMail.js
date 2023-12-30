@@ -2,25 +2,41 @@ const nodemailer = require("nodemailer");
 require("dotenv").config();
 
 const { META_PASSWORD } = process.env;
-const config = {
-  host: "smtp.meta.ua",
-  port: 465,
-  secure: true,
+
+const transport = nodemailer.createTransport({
+  service: "smtp.meta.ua",
   auth: {
-    user: "vugar5gasimov@meta.ua",
-    pass: META_PASSWORD,
+    apiKey: META_PASSWORD,
   },
-};
-const transport = nodemailer.createTransport(config);
+});
 
-const email = {
-  to: "pedeye4623@wenkuu.com",
-  from: "vugar5gasimov@meta.ua",
-  subject: "Test email",
-  html: "<p><strong>Test email Salam</strong> from localhost:3000</p>",
+const sendMail = async (data) => {
+  const email = { ...data, from: "vuqar5qasimov@gmail.com" };
+  await transport.sendMail(email);
+  return true;
 };
 
-transport
-  .sendMail(email)
-  .then(() => console.log("Email send successfully"))
-  .catch((error) => console.log(error.message));
+module.exports = sendMail;
+
+// const config = {
+//   host: "smtp.meta.ua",
+//   port: 465,
+//   secure: true,
+//   auth: {
+//     user: "vugar5gasimov@meta.ua",
+//     pass: META_PASSWORD,
+//   },
+// };
+// const transport = nodemailer.createTransport(config);
+
+// const email = {
+//   to: "pedeye4623@wenkuu.com",
+//   from: "vugar5gasimov@meta.ua",
+//   subject: "Test email",
+//   html: "<p><strong>Test email Salam</strong> from localhost:3000</p>",
+// };
+
+// transport
+//   .sendMail(email)
+//   .then(() => console.log("Email send successfully"))
+//   .catch((error) => console.log(error.message));
