@@ -1,55 +1,48 @@
-# Auth-Contact Manager API
+# Email Verification for Contacts API
 
-## Overview
+Overview
+This project aims to implement email verification functionality for a collection of contacts through a REST API. It integrates SendGrid for sending verification emails to users upon registration.
 
-This project is an API built with Node.js, Express, MongoDB, and JWT authentication. It provides contact management functionality along with user authentication.
+Verification Process
+Upon registration, users receive an email to verify their email address. Clicking the verification link confirms the email, triggering responses based on the link's status.
 
-## Description
+Verification Steps:
+SendGrid Integration:
 
-The API offers user registration, authentication, and CRUD operations for managing contacts stored in a MongoDB database. It ensures secure access to user-specific data by implementing JWT-based authentication.
+Register and set up an email sender on SendGrid.
+Create an API access token and add it to the project's .env file.
+Create Endpoint for Verification:
 
-## Key Features
+Add fields verificationToken and verify to the User model.
+Create a GET /users/verify/:verificationToken endpoint to search and verify users.
+Email Creation for Verification:
 
-- `User Authentication`: Register and log in securely using JWT authentication.
-- `Subscription Levels`: Choose between 'starter', 'pro', or 'business' subscription tiers.
-- `Contact Management`: Perform CRUD operations on contacts, including favorites.
-- `Security Measures`: Safely store passwords with bcrypt encryption.
-- `Scalability`: Implement pagination for efficient contact handling.
-- `Middleware-based Security`: Token validation ensures authorized access.
+Generate a verificationToken for new users during registration.
+Send an email to the user's provided email address with a verification link.
+Resending Verification Email:
 
-## Usage
+Implement a POST /users/verify/ endpoint to resend verification emails.
+Handle scenarios where users might accidentally delete or not receive the initial verification email.
+Steps to Setup
+SendGrid Integration:
 
-### - Installation
+Register and configure an email sender on SendGrid.
+Create an API access token and add it to the project's .env file.
+Implement Verification Process:
 
-- Clone the repository and install dependencies.
-- Set up environment variables like MongoDB URI and JWT secret key in a .env file.
+Create required endpoints as mentioned in the documentation.
+Update the User model to include verification fields.
+Usage:
 
-### - User Authentication
+Clone the repository: git clone <repository_url>
+Install dependencies: npm install
+Start the server: npm start
+Testing:
 
-- Create endpoints for user registration (/users/signup) and login (/users/login).
-- Implement token-based authentication for secure user access.
-
-### - User Management
-
-- Develop routes for updating user subscriptions (/users) and fetching current user details (/users/current).
-
-### - Contact Operations
-
-- Create CRUD endpoints for managing contacts (/api/contacts).
-- Add a PATCH endpoint to update contact favorites (/api/contacts/:contactId/favorite).
-
-### - API Structure
-
-- `models/contacts.js`: Functions for CRUD operations on contacts.
-- `routes/api/contacts.js`: Defines API routes and controllers.
-- `controllers/contacts.js`: Handles requests and interacts with the contact model.
-- `middlewares/validate.js`: Middleware for request body validation using Joi.
-- `schemas/contacts.js`: Joi schemas for request body validation.
-
-### - Dependencies
-
-`express`, `mongoose`, `joi`, `jsonwebtoken`, `bcrypt`
-
-## Contributing
-
-Feel free to contribute by opening issues or creating pull requests.
+Use tools like Postman to test the endpoints.
+Additional Notes
+Ensure to replace <repository_url> with the actual URL of the repository.
+Consider using uuid or nanoid for generating verification tokens.
+Optionally, you can explore using nodemailer as an alternative to SendGrid.
+Optional Task - Dockerfile
+As an additional task, consider creating a Dockerfile for containerizing the application.

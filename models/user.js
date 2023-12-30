@@ -35,6 +35,14 @@ const userSchema = new mongoose.Schema(
       required: [true, "Avatar is required"],
       default: "../public/default_avatar/8380015.webp",
     },
+    verify: {
+      type: Boolean,
+      default: false,
+    },
+    verificationCode: {
+      type: String,
+      default: "",
+    },
   },
   { versionKey: false, timestamps: true }
 );

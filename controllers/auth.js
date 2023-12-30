@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const gravatar = require("gravatar");
 const path = require("path");
 const fs = require("fs/promises");
+const { nanoid } = require("nanoid");
 
 const { User } = require("../models/user");
 const { CustomError, ctrlWrapper } = require("../helpers");
@@ -18,10 +19,14 @@ const signup = async (req, res) => {
   }
   const hashedPassword = await bcrypt.hash(password, 11);
   const avatarUrl = gravatar.url(email);
+
+  const verificationCode = nanoid();
+
   const newUser = await User.create({
     ...req.body,
     password: hashedPassword,
     avatarUrl,
+    verificationCode,
   });
 
   res.status(201).json({
