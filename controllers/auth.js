@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const gravatar = require("gravatar");
 const path = require("path");
 const fs = require("fs/promises");
-const { nanoid } = require("nanoid");
+const uuid = require("uuid");
 
 const { User } = require("../models/user");
 
@@ -22,19 +22,19 @@ const signup = async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, 11);
   const avatarUrl = gravatar.url(email);
 
-  const verificationCode = nanoid();
+  const verificationToken = uuid.v4();
 
   const newUser = await User.create({
     ...req.body,
     password: hashedPassword,
     avatarUrl,
-    verificationCode,
+    verificationToken,
   });
 
   const verifyEmail = {
     to: email,
     subject: "Verify email",
-    html: `<a target="_blank" href="${BASE_URL}/api/auth/verify/${verificationCode}" >Click verify email</a>`,
+    html: `<a target="_blank" href="${BASE_URL}/api/auth/verify/${verificationToken}" >Click verify email</a>`,
   };
 
   await sendEmail(verifyEmail);
@@ -46,14 +46,14 @@ const signup = async (req, res) => {
 };
 
 const verifyEmail = async (req, res) => {
-  const { verificationCode } = req.params;
-  const user = await User.findOne({ verificationCode });
+  const { verificationToken } = req.params;
+  const user = await User.findOne({ verificationToken });
   if (!user) {
     throw CustomError(404, "Invalid code or expired link");
   }
   await User.findByIdAndUpdate(user._id, {
     verify: true,
-    verificationCode: "",
+    verificationToken: "",
   });
   res.json({
     message: "Email verification was successful.",
@@ -72,7 +72,7 @@ const resendVerifyEmail = async (req, res) => {
   const verifyEmail = {
     to: email,
     subject: "Verify email",
-    html: `<a target="_blank" href="${BASE_URL}/api/auth/verify/${user.verificationCode}" >Click verify email</a>`,
+    html: `<a target="_blank" href="${BASE_URL}/api/auth/verify/${user.verificationToken}" >Click verify email</a>`,
   };
   await sendEmail(verifyEmail);
   res.status(204).json({
