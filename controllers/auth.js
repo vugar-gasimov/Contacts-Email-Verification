@@ -11,7 +11,7 @@ const { CustomError, ctrlWrapper, sendEmail } = require("../helpers");
 
 const { SECRET_KEY, BASE_URL } = process.env;
 
-const avatarsDir = path.join(__dirname, "../", "public", "avatars");
+const avatarsDir = path.resolve(__dirname, "public", "avatars");
 
 const signup = async (req, res) => {
   const { email, password } = req.body;
@@ -75,7 +75,7 @@ const resendVerifyEmail = async (req, res) => {
     html: `<a target="_blank" href="${BASE_URL}/api/auth/verify/${user.verificationToken}" >Click verify email</a>`,
   };
   await sendEmail(verifyEmail);
-  res.status(204).json({
+  res.status(200).json({
     message: "Verification of email was successful",
   });
 };
